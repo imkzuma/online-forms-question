@@ -71,7 +71,7 @@ export interface GetDetailFormResponse {
   form: FormField & {
     id: number;
     creator_id: number;
-    questions: Array<Question & { is_required: 1 | 0 }>;
+    questions: Array<Question & { is_required: boolean }>;
   };
 }
 
@@ -97,4 +97,31 @@ export interface RemoveQuestionRequest {
     form_slug: string;
     question_id: number;
   };
+}
+
+export interface AnswerQuestionResponse {
+  message: string;
+}
+
+export interface AnswerQuestionRequest {
+  answers: Array<{
+    question_id: number;
+    value: string;
+  }>;
+}
+
+export interface GetAllAnswersResponse {
+  message: string;
+  responses: Array<{
+    date: string;
+    user: {
+      id: number;
+      name: string;
+      email: string;
+      email_verified_at: string | null;
+    };
+    answers: {
+      [question: string]: string;
+    };
+  }>;
 }

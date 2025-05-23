@@ -17,6 +17,33 @@ export const createQuestionSchema = Yup.object().shape({
   }),
 });
 
+import type { Question } from "../../components/ui/questions/answer/answer.types";
+
+export const createDynamicValidationSchema = (questions: Question[]) => {
+  return Yup.object().shape({
+    answers: Yup.array()
+      .of(
+        Yup.object().shape({
+          question_id: Yup.number().required(),
+          value: Yup.mixed().test(
+            "is-required",
+            "This field is required",
+            function (value) {
+              const questionId = this.parent.question_id;
+              const question = questions.find((q) => q.id === questionId);
+
+              if (question?.is_required) {
+                return value !== undefined && value !== null && value !== "";
+              }
+              return true;
+            },
+          ),
+        }),
+      )
+      .required("Answers are required"),
+  });
+};
+
 export type CreateFormSchema = Yup.InferType<typeof createFormSchema>;
 export const createFormSchema = Yup.object().shape({
   name: Yup.string()

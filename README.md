@@ -1,54 +1,73 @@
-# React + TypeScript + Vite
+# Form Builder Responses Viewer
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A simple web application to display form responses fetched from a REST API, built using **Vite**, **React**, **TypeScript**, and **MUI**.
 
-Currently, two official plugins are available:
+## 📌 Important Notes for Reviewers
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+> ⚠️ **API Limitation Notice**
+>
+> The current API endpoint:
+>
+> ```
+> GET /api/v1/forms/<form_slug>/responses
+> ```
+>
+> does **not** return responses filtered by the given `form_slug`. Instead, it currently returns all submitted responses for **all** forms, regardless of the slug provided.
+>
+> Due to this backend limitation, the **Responses** tab in the application displays the data exactly as received from the API, without further client-side filtering.
+>
+> Once the backend issue is addressed, appropriate filtering logic can be added.
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🚀 Tech Stack
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+- [Vite](https://vitejs.dev/) + [React](https://reactjs.org/) + [TypeScript](https://www.typescriptlang.org/)
+- [MUI](https://mui.com/) – UI Components
+- [Redux Toolkit Query (RTK Query)](https://redux-toolkit.js.org/rtk-query/overview) – API Data Fetching
+- [Yup](https://github.com/jquense/yup) – Validation Schema
+
+---
+
+## 📦 Setup & Installation
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/imkzuma/online-forms-question.git
+cd online-forms-question
+
+pnpm install
+# or
+npm install
+# or
+yarn
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 2. Environment Variables
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Create a `.env` file in the root directory and add the following variables:
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+```env
+VITE_API_URL=https://api.example.com
+```
+
+### 3. Start the Development Server
+
+```bash
+pnpm dev
+# or
+npm run dev
+# or
+yarn dev
+```
+
+### 4. Build for Production
+
+```bash
+pnpm build
+# or
+npm run build
+# or
+yarn build
 ```

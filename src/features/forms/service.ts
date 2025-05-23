@@ -8,6 +8,9 @@ import {
   type CreateQuestionResponse,
   type RemoveQuestionResponse,
   type RemoveQuestionRequest,
+  type AnswerQuestionResponse,
+  type AnswerQuestionRequest,
+  type GetAllAnswersResponse,
 } from "../../libs/api/schema";
 import { baseQuery } from "../../libs/api";
 import { showSnackbar } from "../../components/ui/ui.slice";
@@ -16,7 +19,7 @@ import { removeDeletedQuestionId } from "./slice";
 export const formsApi = createApi({
   reducerPath: "formsApi",
   baseQuery,
-  tagTypes: ["forms", "form", "questions"],
+  tagTypes: ["forms", "form", "questions", "responses"],
   endpoints: (builder) => ({
     getAllForms: builder.query<GetAllFormResponse, void>({
       query: () => ({
@@ -145,6 +148,63 @@ export const formsApi = createApi({
         }
       },
     }),
+    answerQuestion: builder.mutation<
+      AnswerQuestionResponse,
+      {
+        data: AnswerQuestionRequest;
+        form_slug: string;
+      }
+    >({
+      query: ({ form_slug, data }) => ({
+        url: `/forms/${form_slug}/responses`,
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["responses"],
+      async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          dispatch(
+            showSnackbar({
+              message: "Form submitted successfully",
+              severity: "success",
+            }),
+          );
+        } catch {
+          dispatch(
+            showSnackbar({
+              message: "Failed to submit form",
+              severity: "error",
+            }),
+          );
+        }
+      },
+    }),
+    getAllResponses: builder.query<
+      GetAllAnswersResponse,
+      { form_slug: string }
+    >({
+      query: ({ form_slug }) => ({
+        url: `/forms/${form_slug}/responses`,
+        method: "GET",
+      }),
+      providesTags: ["responses"],
+      async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+        } catch (error) {
+          // @ts-expect-error false type
+          const message = error?.error?.data?.message as unknown as string;
+
+          dispatch(
+            showSnackbar({
+              message: message || "Failed to fetch responses",
+              severity: "error",
+            }),
+          );
+        }
+      },
+    }),
   }),
 });
 
@@ -154,4 +214,6 @@ export const {
   useCreateFormMutation,
   useAddQuestionMutation,
   useDeleteQuestionMutation,
+  useAnswerQuestionMutation,
+  useGetAllResponsesQuery,
 } = formsApi;

@@ -27,7 +27,7 @@ export default function ListFormData({ datas, isFetching }: IListFormData) {
   const dispatch = useAppDispatch();
 
   const handleShare = (slug: string) => {
-    const url = `${window.location.origin}/forms/view/${slug}`;
+    const url = `${window.location.origin}/forms/answer/${slug}`;
     navigator.clipboard.writeText(url).then(() => {
       dispatch(
         showSnackbar({

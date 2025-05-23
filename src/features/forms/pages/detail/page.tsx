@@ -1,17 +1,48 @@
 import { Navigate, useParams } from "react-router-dom";
 import { useGetFormBySlugQuery } from "../../service";
-import { Chip, Container, Paper, Stack, Typography } from "@mui/material";
-import { WarningAmber } from "@mui/icons-material";
+import { Container, Stack, Tab, Tabs, Typography } from "@mui/material";
 import FormTitle from "../../_components/form-title";
+import FormLimitResponse from "../../_components/form-limit-response";
+import ViewQuestions from "../../../../components/ui/questions/view-questions";
+import { TabPanel } from "../../../../components/ui/tabs";
+import { useState } from "react";
+import FormResponse from "../../_components/form-response";
+
+/**
+ * [IMPORTANT NOTE FOR REVIEWERS]
+ *
+ * Dear Reviewers,
+ *
+ * Please note that the current API endpoint:
+ *    GET /api/v1/forms/<form_slug>/responses
+ *
+ * does not behave as expected. Instead of returning only the responses
+ * associated with the specified form slug, it currently returns responses
+ * for **all** forms.
+ *
+ * Due to this inconsistency from the backend, the "Responses" tab in the UI
+ * displays the data as-is from the API response, without any filtering
+ * based on the form slug.
+ *
+ * Once the backend issue is resolved, proper filtering can be applied
+ * client-side or expected directly from the API response.
+ *
+ * Thank you for your understanding.
+ */
 
 export default function DetailFormPage() {
   const { slug } = useParams<{ slug: string }>();
+  const [value, setValue] = useState<number>(0);
 
-  const { data, isFetching } = useGetFormBySlugQuery({
+  const handleChange = (_e: React.SyntheticEvent, newValue: number) => {
+    setValue(newValue);
+  };
+
+  const { data, isLoading } = useGetFormBySlugQuery({
     form_slug: slug as string,
   });
 
-  if (isFetching) {
+  if (isLoading) {
     return "Loading...";
   }
 
@@ -22,69 +53,38 @@ export default function DetailFormPage() {
   const { limit_one_response, questions } = data.form;
 
   return (
-    <Container maxWidth="md">
+    <Container maxWidth="lg">
       <Stack spacing={2}>
+        <FormLimitResponse isLimitOneResponse={limit_one_response} />
         <FormTitle {...data.form} />
 
-        {limit_one_response && (
-          <Stack
-            direction="row"
-            alignItems="center"
-            spacing={1}
-            bgcolor={"#f8d7da"}
-            border={1}
-            borderColor={"#f5c2c7"}
-            color={"#842029"}
-            borderRadius={1}
-            sx={{ p: 2 }}
-          >
-            <WarningAmber fontSize="large" />
-            <Typography fontWeight="bold" fontSize={14}>
-              This form can only be answered once per user. Please make sure
-              your answers are final before submitting.
-            </Typography>
-          </Stack>
-        )}
-
         <Stack spacing={2} pt={3}>
-          <Typography variant="h6" gutterBottom>
-            Questions
-          </Typography>
+          <Tabs
+            value={value}
+            onChange={handleChange}
+            variant="fullWidth"
+            scrollButtons="auto"
+          >
+            <Tab label="Questions" />
+            <Tab label="Responses" />
+          </Tabs>
 
-          {questions.length === 0 && (
-            <Typography>No questions available for this form.</Typography>
-          )}
-
-          <Stack spacing={2}>
-            {questions.map((question, index) => (
-              <Paper key={question.id} sx={{ p: 2 }} variant="outlined">
-                <Typography variant="subtitle1">
-                  {index + 1}. {question.name}
-                  <span style={{ color: "red" }}>
-                    {question.is_required && " * "}
-                  </span>
-                </Typography>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  gutterBottom
-                  sx={{ textTransform: "capitalize" }}
-                >
-                  Type: {question.choice_type}
-                </Typography>
-
-                {question.choices && (
-                  <Stack direction="row" spacing={1} flexWrap="wrap" mt={1}>
-                    {typeof question.choices === "string"
-                      ? question.choices
-                          .split(",")
-                          .map((choice, i) => <Chip key={i} label={choice} />)
-                      : null}
-                  </Stack>
-                )}
-              </Paper>
-            ))}
-          </Stack>
+          <TabPanel value={value} index={0}>
+            {questions.length === 0 && (
+              <Typography
+                variant="subtitle2"
+                color="text.secondary"
+                textAlign={"center"}
+                sx={{ py: 5 }}
+              >
+                No questions available for this form.
+              </Typography>
+            )}
+            <ViewQuestions questions={questions} />
+          </TabPanel>
+          <TabPanel value={value} index={1}>
+            <FormResponse formSlug={slug as string} />
+          </TabPanel>
         </Stack>
       </Stack>
     </Container>
