@@ -17,7 +17,7 @@ export const createQuestionSchema = Yup.object().shape({
   }),
 });
 
-import type { Question } from "../../components/ui/questions/answer/answer.types";
+import type { Question } from "../../components/questions/answer/answer.types";
 
 export const createDynamicValidationSchema = (questions: Question[]) => {
   return Yup.object().shape({
@@ -52,17 +52,15 @@ export const createFormSchema = Yup.object().shape({
   slug: Yup.string()
     .required("Form slug is required")
     .matches(
-      /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
-      "Slug must be lowercase and hyphen-separated",
+      /^[a-z0-9]+(?:[-\\.][a-z0-9]+)*$/,
+      "Slug must be lowercase, alphanumeric, and may include dash or dot (no spaces)",
     )
+
     .min(3, "Form slug must be at least 3 characters long"),
   allowed_domains: Yup.array()
     .of(Yup.string().required("Domain is required"))
     .required(),
-  description: Yup.string().min(
-    10,
-    "Description must be at least 10 characters long",
-  ),
+  description: Yup.string().notRequired(),
   limit_one_response: Yup.boolean()
     .required("Limit one response is required")
     .default(true),

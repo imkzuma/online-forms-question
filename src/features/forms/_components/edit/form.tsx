@@ -11,7 +11,7 @@ import {
 } from "../../../../libs/yup/forms";
 import QuestionsEditor, {
   type QuestionsEditorHandle,
-} from "../../../../components/ui/questions/questions-editor";
+} from "../../../../components/questions/questions-editor";
 import type { GetDetailFormResponse } from "../../../../libs/api/schema";
 import { forwardRef } from "react";
 import { Button } from "../../../../components/ui/button";
@@ -27,8 +27,11 @@ const EditFormWithQuestions = forwardRef<QuestionsEditorHandle, Props>(
     const dispatch = useAppDispatch();
     const forms = useAppSelector((state) => state.forms);
 
-    const [addQuestion] = useAddQuestionMutation();
-    const [removeQuestion] = useDeleteQuestionMutation();
+    const [addQuestion, { isLoading: loadingAddQuestion }] =
+      useAddQuestionMutation();
+
+    const [removeQuestion, { isLoading: loadingRemoveQuestion }] =
+      useDeleteQuestionMutation();
 
     const methods = useForm({
       resolver: yupResolver(createFormSchema),
@@ -44,7 +47,6 @@ const EditFormWithQuestions = forwardRef<QuestionsEditorHandle, Props>(
     });
 
     const onSubmit = async (data: CreateFormSchema) => {
-      console.log(data);
       try {
         const slug = initialData.slug;
 
@@ -105,10 +107,17 @@ const EditFormWithQuestions = forwardRef<QuestionsEditorHandle, Props>(
                 },
                 fontSize: 12,
               }}
+              disabled={loadingAddQuestion || loadingRemoveQuestion}
             >
               Cancel
             </Button>
-            <Button fullWidth={false} type="submit" variant="contained">
+            <Button
+              fullWidth={false}
+              type="submit"
+              variant="contained"
+              loading={loadingAddQuestion || loadingRemoveQuestion}
+              loadingIndicator="Saving..."
+            >
               Save
             </Button>
           </Stack>

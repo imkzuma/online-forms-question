@@ -1,12 +1,14 @@
-import { Navigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useGetFormBySlugQuery } from "../../service";
 import { Container, Stack, Tab, Tabs, Typography } from "@mui/material";
 import FormTitle from "../../_components/form-title";
 import FormLimitResponse from "../../_components/form-limit-response";
-import ViewQuestions from "../../../../components/ui/questions/view-questions";
+import ViewQuestions from "../../../../components/questions/view-questions";
 import { TabPanel } from "../../../../components/ui/tabs";
 import { useState } from "react";
 import FormResponse from "../../_components/form-response";
+import Loading from "../../../../components/ui/loading";
+import HeaderWithBackButton from "../../_components/header/with-back-button";
 
 /**
  * [IMPORTANT NOTE FOR REVIEWERS]
@@ -43,11 +45,11 @@ export default function DetailFormPage() {
   });
 
   if (isLoading) {
-    return "Loading...";
+    return <Loading />;
   }
 
   if (!data) {
-    return <Navigate to="/forms" replace />;
+    return null;
   }
 
   const { limit_one_response, questions } = data.form;
@@ -55,6 +57,10 @@ export default function DetailFormPage() {
   return (
     <Container maxWidth="lg">
       <Stack spacing={2}>
+        <Stack pb={2}>
+          <HeaderWithBackButton title="Detail Form" backHref="/forms" />
+        </Stack>
+
         <FormLimitResponse isLimitOneResponse={limit_one_response} />
         <FormTitle {...data.form} />
 

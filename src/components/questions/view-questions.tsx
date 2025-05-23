@@ -1,5 +1,5 @@
 import { Chip, Paper, Stack, Typography } from "@mui/material";
-import type { GetDetailFormResponse } from "../../../libs/api/schema";
+import type { GetDetailFormResponse } from "../../libs/api/schema";
 
 export default function ViewQuestions({
   questions,

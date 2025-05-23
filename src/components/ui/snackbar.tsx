@@ -26,7 +26,7 @@ export const Snackbar = forwardRef<HTMLDivElement, SnackbarProps>(function (
       <Alert
         severity={snackbar.severity}
         variant="filled"
-        sx={{ width: "100%" }}
+        sx={{ width: "100%", py: 1, px: 3 }}
       >
         {snackbar.message}
       </Alert>

@@ -1,4 +1,4 @@
-import type { GetDetailFormResponse } from "../../../../libs/api/schema";
+import type { GetDetailFormResponse } from "../../../libs/api/schema";
 import type {
   UseFormRegister,
   Control,

@@ -1,7 +1,7 @@
-import { Button, Stack } from "@mui/material";
+import { Stack } from "@mui/material";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FormProvider, useForm, type SubmitHandler } from "react-hook-form";
-import { useAnswerQuestionMutation } from "../../../../features/forms/service";
+import { useAnswerQuestionMutation } from "../../../features/forms/service";
 
 import { QuestionCard } from "./question-card";
 import type {
@@ -10,8 +10,9 @@ import type {
   FormValues,
   Question,
 } from "./answer.types";
-import { createDynamicValidationSchema } from "../../../../libs/yup/forms";
+import { createDynamicValidationSchema } from "../../../libs/yup/forms";
 import { useCallback } from "react";
+import { Button } from "../../ui/button";
 
 const getInitialFormValues = (questions: Question[]): FormValues => ({
   answers: questions.map((question) => ({
@@ -109,9 +110,10 @@ export const AnswerFormQuestions: React.FC<AnswerFormQuestionsProps> = ({
             color="primary"
             disabled={Object.keys(errors).length > 0 || questions.length === 0}
             size="large"
-            sx={{ mt: 3 }}
+            loading={isLoading}
+            loadingIndicator="Submitting..."
           >
-            {isLoading ? "Submitting..." : "Submit Form"}
+            Submit Form
           </Button>
         </Stack>
       </form>

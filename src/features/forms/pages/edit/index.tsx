@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector } from "../../../../utils/hooks/redux";
 import FormTitle from "../../_components/form-title";
 import EditFormWithQuestions from "../../_components/edit/form";
 import { Button } from "../../../../components/ui/button";
-import type { QuestionsEditorHandle } from "../../../../components/ui/questions/questions-editor";
+import type { QuestionsEditorHandle } from "../../../../components/questions/questions-editor";
 import { Add, Delete } from "@mui/icons-material";
 import { pushDeletedQuestionId } from "../../slice";
 import {
@@ -17,6 +17,8 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import Loading from "../../../../components/ui/loading";
+import HeaderWithBackButton from "../../_components/header/with-back-button";
 
 export default function EditFormPage() {
   const forms = useAppSelector((state) => state.forms);
@@ -31,7 +33,7 @@ export default function EditFormPage() {
   });
 
   if (isLoading) {
-    return "Loading...";
+    return <Loading />;
   }
 
   if (!data) {
@@ -41,8 +43,11 @@ export default function EditFormPage() {
   return (
     <Container maxWidth="md">
       <Stack spacing={2}>
-        <FormTitle {...data.form} />
+        <Stack pb={2}>
+          <HeaderWithBackButton title="Edit Form" backHref="/forms" />
+        </Stack>
 
+        <FormTitle {...data.form} />
         <Stack spacing={2} pt={3}>
           <Stack
             direction={"row"}
@@ -61,11 +66,9 @@ export default function EditFormPage() {
               Add Question
             </Button>
           </Stack>
-
           {data.form.questions.length === 0 && (
             <Typography>No questions available for this form.</Typography>
           )}
-
           <Stack spacing={2}>
             {data.form.questions.map((question, index) => {
               if (forms.questions_id?.includes(question.id)) {
@@ -126,7 +129,6 @@ export default function EditFormPage() {
               );
             })}
           </Stack>
-
           <EditFormWithQuestions ref={questionsRef} initialData={data.form} />
         </Stack>
       </Stack>

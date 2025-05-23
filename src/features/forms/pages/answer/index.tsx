@@ -1,9 +1,10 @@
-import { Navigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useGetFormBySlugQuery } from "../../service";
 import { Container, Stack } from "@mui/material";
 import FormTitle from "../../_components/form-title";
 import FormLimitResponse from "../../_components/form-limit-response";
-import { AnswerFormQuestions } from "../../../../components/ui/questions/answer";
+import { AnswerFormQuestions } from "../../../../components/questions/answer";
+import Loading from "../../../../components/ui/loading";
 
 export default function AnswerFormPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -13,12 +14,9 @@ export default function AnswerFormPage() {
   });
 
   if (isFetching) {
-    return "Loading...";
+    return <Loading />;
   }
-
-  if (!data) {
-    return <Navigate to="/forms" replace />;
-  }
+  if (!data) return null;
 
   const { limit_one_response } = data.form;
 

@@ -10,6 +10,7 @@ import { rehydrate, setAuthStatus } from "../features/auth/slice";
 import type { LoginResponse } from "../libs/api/schema";
 import { Snackbar } from "../components/ui/snackbar";
 import { showSnackbar } from "../components/ui/ui.slice";
+import GlobalAlertDialog from "../components/ui/alert-dialog";
 
 export default function App() {
   const dispatch = useAppDispatch();
@@ -43,6 +44,7 @@ export default function App() {
     <Fragment>
       <Routes />
       <Snackbar />
+      <GlobalAlertDialog />
     </Fragment>
   );
 }

@@ -2,6 +2,7 @@ import { useLocation, Navigate } from "react-router-dom";
 import PublicRoutes from "./public-route";
 import ProtectedRoutes from "./protected-route";
 import { useAppSelector } from "../../utils/hooks/redux";
+import Loading from "../../components/ui/loading";
 
 const Routes = () => {
   const { authenticated } = useAppSelector((state) => state.auth);
@@ -19,7 +20,7 @@ const Routes = () => {
     return <PublicRoutes />;
   }
 
-  return "loading...";
+  return <Loading />;
 };
 
 export default Routes;

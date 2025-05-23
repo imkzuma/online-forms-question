@@ -13,7 +13,7 @@ import {
   type GetAllAnswersResponse,
 } from "../../libs/api/schema";
 import { baseQuery } from "../../libs/api";
-import { showSnackbar } from "../../components/ui/ui.slice";
+import { showModal, showSnackbar } from "../../components/ui/ui.slice";
 import { removeDeletedQuestionId } from "./slice";
 
 export const formsApi = createApi({
@@ -52,14 +52,18 @@ export const formsApi = createApi({
           await queryFulfilled;
         } catch (error) {
           // @ts-expect-error false type
-          const message = error?.error?.data?.message as unknown as string;
+          const code = error?.error?.data?.code as unknown as number;
 
-          dispatch(
-            showSnackbar({
-              message: message || "Failed to fetch form",
-              severity: "error",
-            }),
-          );
+          if (code === 403) {
+            dispatch(
+              showModal({
+                title: "Forbidden Access",
+                message: "You are not allowed to access this form",
+                type: "error",
+                href: "/forms",
+              }),
+            );
+          }
         }
       },
     }),
@@ -164,17 +168,33 @@ export const formsApi = createApi({
       async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
         try {
           await queryFulfilled;
+
           dispatch(
-            showSnackbar({
-              message: "Form submitted successfully",
-              severity: "success",
+            showModal({
+              title: "Form submitted successfully",
+              message: "Thank you for your response",
+              type: "success",
+              href: "/forms",
             }),
           );
-        } catch {
+        } catch (error) {
+          // @ts-expect-error: API error typing not precise
+          const code = error?.error?.data?.code as unknown as number;
+
+          let title = "Failed to submit form";
+          let message = "Failed to submit form";
+
+          if (code === 422) {
+            title = "Form already submitted";
+            message = "You have already submitted this form";
+          }
+
           dispatch(
-            showSnackbar({
-              message: "Failed to submit form",
-              severity: "error",
+            showModal({
+              title,
+              message,
+              type: "error",
+              href: "/forms",
             }),
           );
         }

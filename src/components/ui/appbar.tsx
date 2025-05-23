@@ -123,9 +123,6 @@ export const AppBar = forwardRef<HTMLDivElement, Props>(function (
             transformOrigin={{ horizontal: "right", vertical: "top" }}
             anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
           >
-            <MenuItem onClick={handleClose} sx={{ fontSize: 15, width: 200 }}>
-              Profile
-            </MenuItem>
             <MenuItem
               onClick={() => setOpenModal(true)}
               sx={{ fontSize: 15, width: 200 }}

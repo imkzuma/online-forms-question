@@ -8,10 +8,11 @@ import {
   Typography,
 } from "@mui/material";
 import { useFieldArray, Controller, useFormContext } from "react-hook-form";
-import { type CreateFormSchema } from "../../../libs/yup/forms";
-import { TextField } from "../field";
+import { type CreateFormSchema } from "../../libs/yup/forms";
+import { TextField } from "../ui/field";
 import { forwardRef, useImperativeHandle } from "react";
 import { Add, Delete } from "@mui/icons-material";
+import { Button } from "../ui/button";
 
 const choiceTypes = [
   "short answer",
@@ -31,6 +32,7 @@ const QuestionsEditor = forwardRef<QuestionsEditorHandle>((_, ref) => {
     control,
     register,
     watch,
+    setValue,
     formState: { errors },
   } = useFormContext<CreateFormSchema>();
 
@@ -77,9 +79,21 @@ const QuestionsEditor = forwardRef<QuestionsEditorHandle>((_, ref) => {
               label="Choice Type"
               select
               fullWidth
-              defaultValue={field.choice_type}
-              {...register(`questions.${index}.choice_type`)}
               margin="normal"
+              defaultValue={field.choice_type}
+              onChange={(e) => {
+                if (
+                  ["multiple choice", "dropdown", "checkboxes"].includes(
+                    e.target.value,
+                  )
+                ) {
+                  const choices = watch(`questions.${index}.choices`);
+                  if (!Array.isArray(choices) || choices.length === 0) {
+                    setValue(`questions.${index}.choices`, [""]);
+                  }
+                }
+                setValue(`questions.${index}.choice_type`, e.target.value);
+              }}
             >
               {choiceTypes.map((type) => (
                 <MenuItem key={type} value={type}>
@@ -114,17 +128,21 @@ const QuestionsEditor = forwardRef<QuestionsEditorHandle>((_, ref) => {
                         <Stack
                           direction="row"
                           alignItems="center"
+                          justifyContent={"space-between"}
                           mb={3}
                           spacing={2}
                         >
                           <Typography fontWeight="bold">Choices</Typography>
-                          <IconButton
+                          <Button
                             size="small"
-                            color="primary"
+                            fullWidth={false}
+                            variant="text"
+                            sx={{ color: "primary.main", fontSize: 12 }}
                             onClick={handleAddChoice}
+                            startIcon={<Add fontSize="small" />}
                           >
-                            <Add fontSize="small" />
-                          </IconButton>
+                            Add Choice
+                          </Button>
                         </Stack>
 
                         <Stack spacing={3} mb={3}>

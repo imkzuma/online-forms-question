@@ -1,5 +1,4 @@
 import {
-  TextField,
   Checkbox,
   FormControlLabel,
   Box,
@@ -16,26 +15,37 @@ import {
 } from "../../../../libs/yup/forms";
 import QuestionsEditor, {
   type QuestionsEditorHandle,
-} from "../../../../components/ui/questions/questions-editor";
+} from "../../../../components/questions/questions-editor";
 import { useRef } from "react";
 import { Add } from "@mui/icons-material";
 import { Button } from "../../../../components/ui/button";
+import { TextField } from "../../../../components/ui/field";
 
 export default function CreateFormWithQuestions() {
   const questionRef = useRef<QuestionsEditorHandle>(null);
 
-  const [createForm] = useCreateFormMutation();
-  const [addQuestion] = useAddQuestionMutation();
+  const [createForm, { isLoading: loadingCreateForm }] =
+    useCreateFormMutation();
+
+  const [addQuestion, { isLoading: loadingAddQuestion }] =
+    useAddQuestionMutation();
 
   const methods = useForm({
     resolver: yupResolver(createFormSchema),
     defaultValues: {
       name: "",
       slug: "",
-      description: "",
+      description: undefined,
       allowed_domains: [""],
       limit_one_response: false,
-      questions: [],
+      questions: [
+        {
+          name: "",
+          choice_type: "short answer",
+          is_required: false,
+          choices: [],
+        },
+      ],
     },
     mode: "onChange",
   });
@@ -80,115 +90,158 @@ export default function CreateFormWithQuestions() {
 
   return (
     <FormProvider {...methods}>
-      <Box
+      <Stack
+        spacing={3}
+        mt={4}
         component="form"
         onSubmit={methods.handleSubmit(onSubmit)}
-        sx={{ p: 3 }}
       >
-        <Typography variant="h5">Create Form</Typography>
+        <Stack
+          bgcolor={"white"}
+          p={2}
+          borderRadius={2}
+          border={1}
+          borderColor={"grey.200"}
+        >
+          <TextField
+            label="Name"
+            fullWidth
+            {...methods.register("name")}
+            margin="normal"
+            required
+            placeholder="Example Form"
+            error={!!methods.formState.errors.name}
+            helperText={methods.formState.errors.name?.message || ""}
+          />
+          <TextField
+            label="Slug"
+            placeholder="example-form"
+            fullWidth
+            required
+            {...methods.register("slug")}
+            margin="normal"
+            error={!!methods.formState.errors.slug}
+            helperText={methods.formState.errors.slug?.message || ""}
+          />
+          <Controller
+            name="allowed_domains"
+            control={methods.control}
+            render={({ field }) => (
+              <>
+                {Array.isArray(field.value) && field.value.length > 0 && (
+                  <Box mt={1} display="flex" flexWrap="wrap" gap={1}>
+                    {field.value.map((domain, i) => {
+                      if (domain.length === 0) return null;
+                      return <Chip key={i} label={domain} />;
+                    })}
+                  </Box>
+                )}
+                <TextField
+                  label="Allowed Domains (comma separated)"
+                  fullWidth
+                  required
+                  onChange={(e) => {
+                    const value = e.target.value
+                      .split(",")
+                      .map((v) => v.trim());
+                    field.onChange(value);
+                  }}
+                  onBlur={() => {
+                    const uniqueDomains = Array.from(
+                      new Set(
+                        (field.value || [])
+                          .map((v) => v.trim())
+                          .filter((v) => v.length > 0),
+                      ),
+                    );
+                    field.onChange(uniqueDomains);
+                    field.onBlur();
+                  }}
+                  value={
+                    Array.isArray(field.value)
+                      ? field.value.join(",")
+                      : field.value
+                  }
+                  placeholder="example.com, example.org"
+                  error={!!methods.formState.errors.allowed_domains}
+                  margin="normal"
+                />
+              </>
+            )}
+          />
+          <TextField
+            label="Description"
+            fullWidth
+            multiline
+            rows={4}
+            {...methods.register("description")}
+            margin="normal"
+          />
 
-        <TextField
-          label="Name"
-          fullWidth
-          {...methods.register("name")}
-          margin="normal"
-        />
-        <TextField
-          label="Slug"
-          fullWidth
-          {...methods.register("slug")}
-          margin="normal"
-        />
-        <TextField
-          label="Description"
-          fullWidth
-          {...methods.register("description")}
-          margin="normal"
-        />
-
-        <Controller
-          name="allowed_domains"
-          control={methods.control}
-          render={({ field }) => (
-            <>
-              {Array.isArray(field.value) && field.value.length > 0 && (
-                <Box mt={1} display="flex" flexWrap="wrap" gap={1}>
-                  {field.value.map((domain, i) => {
-                    if (domain.length === 0) return null;
-                    return <Chip key={i} label={domain} />;
-                  })}
-                </Box>
-              )}
-              <TextField
-                label="Allowed Domains (comma separated)"
-                fullWidth
-                onChange={(e) => {
-                  const value = e.target.value.split(",").map((v) => v.trim());
-                  field.onChange(value);
-                }}
-                onBlur={() => {
-                  const uniqueDomains = Array.from(
-                    new Set(
-                      (field.value || [])
-                        .map((v) => v.trim())
-                        .filter((v) => v.length > 0),
-                    ),
-                  );
-                  field.onChange(uniqueDomains);
-                  field.onBlur();
-                }}
-                value={
-                  Array.isArray(field.value)
-                    ? field.value.join(",")
-                    : field.value
-                }
-                placeholder="example.com, example.org"
-                error={!!methods.formState.errors.allowed_domains}
-                margin="normal"
+          <FormControlLabel
+            sx={{ width: "fit-content" }}
+            control={
+              <Controller
+                name="limit_one_response"
+                control={methods.control}
+                render={({ field }) => <Checkbox {...field} />}
               />
-            </>
-          )}
-        />
+            }
+            label="Limit to 1 response"
+          />
+        </Stack>
 
-        <FormControlLabel
-          control={
-            <Controller
-              name="limit_one_response"
-              control={methods.control}
-              render={({ field }) => <Checkbox {...field} />}
-            />
-          }
-          label="Limit to 1 response"
-        />
+        <Stack spacing={1}>
+          <Stack
+            direction={"row"}
+            justifyContent={"space-between"}
+            alignContent={"center"}
+          >
+            <Typography variant="h6">Questions</Typography>
+            <Button
+              fullWidth={false}
+              size="small"
+              onClick={() => questionRef.current?.appendQuestion()}
+              startIcon={<Add />}
+            >
+              Add Question
+            </Button>
+          </Stack>
+          <QuestionsEditor ref={questionRef} />
+        </Stack>
 
         <Stack
-          direction={"row"}
-          justifyContent={"space-between"}
+          justifyContent={"end"}
           alignContent={"center"}
+          direction={"row"}
+          spacing={1}
         >
-          <Typography variant="h6" gutterBottom>
-            Questions
-          </Typography>
           <Button
             fullWidth={false}
-            size="small"
-            onClick={() => questionRef.current?.appendQuestion()}
-            startIcon={<Add />}
+            onClick={() => methods.reset()}
+            sx={{
+              bgcolor: "grey.200",
+              color: "grey.800",
+              "&:hover": {
+                bgcolor: "grey.300",
+              },
+              fontSize: 12,
+            }}
+            disabled={loadingCreateForm || loadingAddQuestion}
           >
-            Add Question
+            Cancel
+          </Button>
+          <Button
+            fullWidth={false}
+            type="submit"
+            variant="contained"
+            loading={loadingCreateForm || loadingAddQuestion}
+            loadingIndicator="Creating..."
+          >
+            Create
           </Button>
         </Stack>
-        <QuestionsEditor ref={questionRef} />
-
-        <Button
-          fullWidth={false}
-          type="submit"
-          variant="contained"
-          sx={{ mt: 3 }}
-        >
-          Submit Form
-        </Button>
-      </Box>
+      </Stack>
     </FormProvider>
   );
 }
