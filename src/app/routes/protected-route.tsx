@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import FormsPage from "../../features/forms/pages";
 import CreateFormPage from "../../features/forms/pages/create";
 import DetailFormPage from "../../features/forms/pages/detail/page";
@@ -9,6 +9,8 @@ import NotFoundPage from "../../components/ui/not-found";
 
 const ProtectedRoutes = () => (
   <Routes>
+    <Route path="/" element={<Navigate to="/forms" replace />} />
+
     <Route path="/forms" element={<FormsPageLayout />}>
       <Route index element={<FormsPage />} />
       <Route path="create" element={<CreateFormPage />} />
