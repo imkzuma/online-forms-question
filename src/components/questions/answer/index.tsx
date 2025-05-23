@@ -10,7 +10,7 @@ import type {
   FormValues,
   Question,
 } from "./answer.types";
-import { createDynamicValidationSchema } from "../../../libs/yup/forms";
+import { dynamicQuestionValidation } from "../../../libs/yup/questions";
 import { useCallback } from "react";
 import { Button } from "../../ui/button";
 
@@ -49,7 +49,7 @@ export const AnswerFormQuestions: React.FC<AnswerFormQuestionsProps> = ({
 
   const methods = useForm<FormValues>({
     // @ts-expect-error missmatch typechecking
-    resolver: yupResolver(createDynamicValidationSchema(questions)),
+    resolver: yupResolver(dynamicQuestionValidation(questions)),
     defaultValues: getInitialFormValues(questions),
     mode: "onTouched",
   });

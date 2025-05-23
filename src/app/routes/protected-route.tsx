@@ -5,6 +5,7 @@ import DetailFormPage from "../../features/forms/pages/detail/page";
 import FormsPageLayout from "../../features/forms/pages/layout";
 import EditFormPage from "../../features/forms/pages/edit";
 import AnswerFormPage from "../../features/forms/pages/answer";
+import NotFoundPage from "../../components/ui/not-found";
 
 const ProtectedRoutes = () => (
   <Routes>
@@ -15,7 +16,7 @@ const ProtectedRoutes = () => (
       <Route path="edit/:slug" element={<EditFormPage />} />
       <Route path="answer/:slug" element={<AnswerFormPage />} />
     </Route>
-    <Route path="*" element={<h1>notfound</h1>} />
+    <Route path="*" element={<NotFoundPage />} />
   </Routes>
 );
 

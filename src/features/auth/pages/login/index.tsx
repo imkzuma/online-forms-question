@@ -16,7 +16,7 @@ const StyledHeader = styled(CardHeader)(({ theme }) => ({
   padding: theme.spacing(4, 2),
 }));
 
-export default function MaterialUILoginPage() {
+export default function LoginPage() {
   return (
     <Box
       sx={{

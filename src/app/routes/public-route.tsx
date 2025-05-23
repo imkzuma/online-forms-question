@@ -1,10 +1,10 @@
 import { Route, Routes } from "react-router-dom";
-import MaterialUILoginPage from "../../features/auth/pages/login";
+import LoginPage from "../../features/auth/pages/login";
 
 const PublicRoutes = () => (
   <Routes>
-    <Route path="/auth/login" element={<MaterialUILoginPage />} />
-    <Route path="*" element={<MaterialUILoginPage />} />
+    <Route path="/auth/login" element={<LoginPage />} />
+    <Route path="*" element={<LoginPage />} />
   </Routes>
 );
 
