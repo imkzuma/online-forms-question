@@ -6,23 +6,29 @@ import {
   type CreateFormRequest,
   type CreateQuestionRequest,
   type CreateQuestionResponse,
+  type RemoveQuestionResponse,
+  type RemoveQuestionRequest,
 } from "../../libs/api/schema";
 import { baseQuery } from "../../libs/api";
 import { showSnackbar } from "../../components/ui/ui.slice";
+import { removeDeletedQuestionId } from "./slice";
 
 export const formsApi = createApi({
   reducerPath: "formsApi",
   baseQuery,
+  tagTypes: ["forms", "form", "questions"],
   endpoints: (builder) => ({
     getAllForms: builder.query<GetAllFormResponse, void>({
       query: () => ({
         url: "/forms",
         method: "GET",
       }),
+      providesTags: ["forms"],
       async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
         try {
           await queryFulfilled;
-        } catch {
+        } catch (error) {
+          console.log(error);
           dispatch(
             showSnackbar({
               message: "Failed to fetch forms",
@@ -37,6 +43,22 @@ export const formsApi = createApi({
         url: `/forms/${form_slug}`,
         method: "GET",
       }),
+      providesTags: ["form", "questions"],
+      async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+        } catch (error) {
+          // @ts-expect-error false type
+          const message = error?.error?.data?.message as unknown as string;
+
+          dispatch(
+            showSnackbar({
+              message: message || "Failed to fetch form",
+              severity: "error",
+            }),
+          );
+        }
+      },
     }),
     createForm: builder.mutation<CreateFormResponse, CreateFormRequest>({
       query: (body) => ({
@@ -44,10 +66,10 @@ export const formsApi = createApi({
         method: "POST",
         body,
       }),
+      invalidatesTags: ["forms", "form"],
       async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
         try {
-          const data = await queryFulfilled;
-          console.log(data);
+          await queryFulfilled;
           dispatch(
             showSnackbar({
               message: "Form created successfully",
@@ -73,6 +95,7 @@ export const formsApi = createApi({
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["questions"],
       async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
         try {
           await queryFulfilled;
@@ -92,6 +115,36 @@ export const formsApi = createApi({
         }
       },
     }),
+    deleteQuestion: builder.mutation<
+      RemoveQuestionResponse,
+      RemoveQuestionRequest["params"]
+    >({
+      query: ({ form_slug, question_id }) => ({
+        url: `/forms/${form_slug}/questions/${question_id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["questions"],
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+
+          dispatch(removeDeletedQuestionId(arg.question_id));
+          dispatch(
+            showSnackbar({
+              message: "Question deleted successfully",
+              severity: "success",
+            }),
+          );
+        } catch {
+          dispatch(
+            showSnackbar({
+              message: "Failed to delete question",
+              severity: "error",
+            }),
+          );
+        }
+      },
+    }),
   }),
 });
 
@@ -100,4 +153,5 @@ export const {
   useGetFormBySlugQuery,
   useCreateFormMutation,
   useAddQuestionMutation,
+  useDeleteQuestionMutation,
 } = formsApi;

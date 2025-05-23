@@ -1,4 +1,4 @@
-import CreateFormWithQuestions from "../../_components/create-form/form";
+import CreateFormWithQuestions from "../../_components/create/form";
 import HeaderWithBackButton from "../../_components/header/with-back-button";
 
 export default function CreateFormPage() {

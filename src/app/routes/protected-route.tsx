@@ -3,6 +3,7 @@ import FormsPage from "../../features/forms/pages";
 import CreateFormPage from "../../features/forms/pages/create";
 import DetailFormPage from "../../features/forms/pages/detail/page";
 import FormsPageLayout from "../../features/forms/pages/layout";
+import EditFormPage from "../../features/forms/pages/edit";
 
 const ProtectedRoutes = () => (
   <Routes>
@@ -10,6 +11,7 @@ const ProtectedRoutes = () => (
       <Route index element={<FormsPage />} />
       <Route path="create" element={<CreateFormPage />} />
       <Route path="view/:slug" element={<DetailFormPage />} />
+      <Route path="edit/:slug" element={<EditFormPage />} />
     </Route>
     <Route path="*" element={<h1>notfound</h1>} />
   </Routes>

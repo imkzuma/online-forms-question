@@ -1,74 +1,30 @@
-import { useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Navigate, useParams } from "react-router-dom";
 import { useGetFormBySlugQuery } from "../../service";
-import { useAppDispatch } from "../../../../utils/hooks/redux";
-import { showSnackbar } from "../../../../components/ui/ui.slice";
 import { Chip, Container, Paper, Stack, Typography } from "@mui/material";
 import { WarningAmber } from "@mui/icons-material";
+import FormTitle from "../../_components/form-title";
 
 export default function DetailFormPage() {
-  const dispatch = useAppDispatch();
-  const navigate = useNavigate();
   const { slug } = useParams<{ slug: string }>();
 
   const { data, isFetching } = useGetFormBySlugQuery({
     form_slug: slug as string,
   });
 
-  useEffect(() => {
-    if (!isFetching && !data) {
-      dispatch(
-        showSnackbar({
-          message: "Form not found, please try again later.",
-          severity: "error",
-        }),
-      );
-      navigate("/forms", { replace: true });
-    }
-  }, [isFetching, data, dispatch, navigate]);
-
   if (isFetching) {
     return "Loading...";
   }
 
   if (!data) {
-    return null;
+    return <Navigate to="/forms" replace />;
   }
 
-  const { name, description, allowed_domains, limit_one_response, questions } =
-    data.form;
+  const { limit_one_response, questions } = data.form;
 
   return (
     <Container maxWidth="md">
       <Stack spacing={2}>
-        <Stack
-          bgcolor={"white"}
-          borderRadius={1.5}
-          sx={{
-            p: 3,
-            border: 1,
-            borderColor: "grey.200",
-            borderTop: 10,
-            borderTopColor: "primary.main",
-          }}
-        >
-          <Typography variant="h4" gutterBottom>
-            {name}
-          </Typography>
-          <Typography variant="body1" color="text.secondary" gutterBottom>
-            {description}
-          </Typography>
-          <Stack direction={"row"} spacing={1} alignItems={"center"} pt={3}>
-            <Typography color="grey.600" fontSize={14}>
-              <strong>Allowed Domains:</strong>
-            </Typography>
-            {allowed_domains.length > 0
-              ? allowed_domains.map((domain) => (
-                  <Chip key={domain} label={domain} />
-                ))
-              : "No domains allowed"}
-          </Stack>
-        </Stack>
+        <FormTitle {...data.form} />
 
         {limit_one_response && (
           <Stack
@@ -104,6 +60,9 @@ export default function DetailFormPage() {
               <Paper key={question.id} sx={{ p: 2 }} variant="outlined">
                 <Typography variant="subtitle1">
                   {index + 1}. {question.name}
+                  <span style={{ color: "red" }}>
+                    {question.is_required && " * "}
+                  </span>
                 </Typography>
                 <Typography
                   variant="caption"

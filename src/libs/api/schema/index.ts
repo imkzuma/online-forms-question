@@ -87,3 +87,14 @@ export interface CreateQuestionRequest
   extends Omit<Question, "id" | "is_required"> {
   is_required: boolean;
 }
+
+export interface RemoveQuestionResponse {
+  message: string;
+}
+
+export interface RemoveQuestionRequest {
+  params: {
+    form_slug: string;
+    question_id: number;
+  };
+}

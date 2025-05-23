@@ -10,7 +10,9 @@ export const createQuestionSchema = Yup.object().shape({
     is: (val: string) =>
       ["multiple choice", "dropdown", "checkboxes"].includes(val),
     then: () =>
-      Yup.array().of(Yup.string().required()).min(1, "Choices required"),
+      Yup.array()
+        .of(Yup.string().required("Each choice must be filled"))
+        .min(1, "At least one choice is required"),
     otherwise: () => Yup.mixed().notRequired(),
   }),
 });
