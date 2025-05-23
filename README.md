@@ -49,7 +49,7 @@ yarn
 Create a `.env` file in the root directory and add the following variables:
 
 ```env
-VITE_API_URL=https://api.example.com
+VITE_API_URL=https://your.api.domain.com/api/v1
 ```
 
 ### 3. Start the Development Server
