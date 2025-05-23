@@ -48,6 +48,7 @@ export const authApi = createApi({
           localStorage.removeItem("user");
 
           dispatch(clearUser());
+          dispatch(setAuthStatus("unauthenticated"));
           dispatch(
             showSnackbar({
               message: "Logout successful.",
